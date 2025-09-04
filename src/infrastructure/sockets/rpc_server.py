@@ -2,11 +2,11 @@ from dataclasses import asdict
 import json
 import logging
 
-from rpc.application.config import METHOD_TABLE
-from rpc.domain.interfaces.serializer import Serializer
-from rpc.domain.entities.rpc_request import RpcRequest
-from rpc.domain.entities.rpc_response import RpcResponse
-from rpc.domain.interfaces.socket_handler import SocketHandler
+from src.application.config import METHOD_TABLE
+from src.domain.interfaces.serializer import Serializer
+from src.domain.entities.rpc_request import RpcRequest
+from src.domain.entities.rpc_response import RpcResponse
+from src.domain.interfaces.socket_handler import SocketHandler
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

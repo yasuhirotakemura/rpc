@@ -1,5 +1,5 @@
 import json
-from rpc.domain.interfaces.serializer import Serializer
+from src.domain.interfaces.serializer import Serializer
 
 class JsonSerializer(Serializer):
     def encode(self, data: dict) -> bytes:

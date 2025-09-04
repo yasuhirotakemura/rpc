@@ -1,5 +1,5 @@
 # config.py
-from rpc.domain.services.rpc_functions import RpcFunctions
+from src.domain.services.rpc_functions import RpcFunctions
 
 
 METHOD_TABLE = {

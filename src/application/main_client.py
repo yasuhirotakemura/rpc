@@ -1,6 +1,6 @@
-from rpc.infrastructure.serializers.json_serializer import JsonSerializer
-from rpc.infrastructure.sockets.rpc_client import RpcClient
-from rpc.infrastructure.sockets.unix_socket_handler import UnixSocketHandler
+from src.infrastructure.serializers.json_serializer import JsonSerializer
+from src.infrastructure.sockets.rpc_client import RpcClient
+from src.infrastructure.sockets.unix_socket_handler import UnixSocketHandler
 
 def main():
     server_address: str = '127.0.0.1'

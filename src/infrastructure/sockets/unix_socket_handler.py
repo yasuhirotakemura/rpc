@@ -1,5 +1,5 @@
 import socket
-from rpc.domain.interfaces.socket_handler import SocketHandler
+from src.domain.interfaces.socket_handler import SocketHandler
 
 class UnixSocketHandler(SocketHandler):
     def __init__(self):
