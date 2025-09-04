@@ -1,0 +1,28 @@
+[MASTER]
+# 並列実行を有効化（速くなる）
+jobs=2
+
+[MESSAGES CONTROL]
+# 面倒なdocstring関連は無効化
+disable=
+    C0114,  # missing-module-docstring
+    C0115,  # missing-class-docstring
+    C0116,  # missing-function-docstring
+    R0903,  # too-few-public-methods
+    R0201,  # method could be a function
+
+[FORMAT]
+# 行長は120にする（79は厳しすぎ）
+max-line-length=120
+
+[DESIGN]
+# クラスの最大属性数（デフォルト7 → もっと緩める）
+max-attributes=12
+
+[BASIC]
+# 良くある変数名を許容
+good-names=i,j,k,ex,Run,_
+
+[REPORTS]
+# スコアは不要
+score=no
