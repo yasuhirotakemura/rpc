@@ -1,7 +1,9 @@
 from dataclasses import asdict
 import json
 import logging
+import os
 
+from src.domain.exceptions.rpc_internal_server_error import RpcInternalServerError
 from src.application.config import METHOD_TABLE
 from src.domain.interfaces.serializer import Serializer
 from src.domain.entities.rpc_request import RpcRequest
@@ -17,6 +19,13 @@ class RpcServer:
         self.socket_handler: SocketHandler = socket_handler
         self.serializer: Serializer = serializer
 
+    def remove_file_if_exists(self) -> None:
+        """同じサーバーアドレスのファイルがある場合に削除する"""
+        try:
+            os.unlink(self.server_address)
+        except FileNotFoundError:
+            pass
+
     def sent_data(self, client_address: str, response: RpcResponse) -> None:
         """クライアントにデータを送信"""
         response_data = self.serializer.encode(asdict(response))
@@ -24,7 +33,7 @@ class RpcServer:
         try:
             self.socket_handler.sendto(response_data, client_address)
             logger.info("The following data was sent to the client: %s", response_data)
-        except Exception as e:
+        except RpcInternalServerError as e:
             logger.error("Error while sending data: %s", e)
 
     def display_receive_data(self, received_data: bytes, client_address: str) -> None:
@@ -42,14 +51,14 @@ class RpcServer:
                 raise ValueError("Unknown method: %s" % request.method)
 
             method_func = METHOD_TABLE[request.method]
-            result = method_func(*request.params)
+            result = method_func(*request.casted_params())
 
             return RpcResponse(
                 results=str(result),
                 result_type=type(result).__name__,
                 id=request.id
             )
-        except Exception as e:
+        except RpcInternalServerError as e:
             return RpcResponse(error=str(e), id=request.id)
 
     def receive_data(self) -> None:
@@ -74,18 +83,20 @@ class RpcServer:
                 error_response = RpcResponse(error=f"Invalid JSON: {str(e)}")
                 self.sent_data(client_address, error_response)
 
-            except Exception as e:
+            except RpcInternalServerError as e:
                 logger.error("Unexpected server error: %s", e)
                 error_response = RpcResponse(error=f"Server error: {str(e)}")
                 self.sent_data(client_address, error_response)
 
     def start(self) -> None:
         """サーバーを起動"""
+        self.remove_file_if_exists()
+        
         try:
             self.socket_handler.bind(self.server_address)
             logger.info("Server started on: %s", self.server_address)
             self.receive_data()
-        except Exception as e:
+        except RpcInternalServerError as e:
             logger.error("Server start failed: %s", e)
         finally:
             self.socket_handler.close()

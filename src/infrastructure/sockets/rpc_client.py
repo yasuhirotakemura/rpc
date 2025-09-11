@@ -1,7 +1,10 @@
 from dataclasses import asdict
 import logging
 import os
+import uuid
 
+from src.domain.exceptions.rpc_error import RpcError
+from src.domain.exceptions.rpc_type_casting_error import RpcTypeCastingError
 from src.domain.interfaces.serializer import Serializer
 from src.domain.entities.rpc_request import RpcRequest
 from src.domain.interfaces.socket_handler import SocketHandler
@@ -17,6 +20,13 @@ class RpcClient:
         self.socket_handler = socket_handler
         self.serializer = serializer
 
+    def confirm_exit(self, use_input: str) -> bool:
+        """終了確認"""
+        if use_input.lower() != "exit":
+            return False
+        
+        return True
+
     def remove_file_if_exists(self) -> None:
         """同じクライアントアドレスのファイルがある場合に削除する"""
         try:
@@ -29,7 +39,7 @@ class RpcClient:
         data_str: str = self.serializer.decode(received_data)
         logger.info("A message of %d bytes was sent from server address %s",
                     len(received_data), server_address)
-        logger.debug("Server response: %s", data_str)
+        logger.info("Server response: %s", data_str)
 
     def receive_data(self) -> None:
         """サーバーからのデータを受信する"""
@@ -41,20 +51,37 @@ class RpcClient:
         """サーバーにデータを送信する"""
         while True:
             method_name: str = input("Enter the method name : ")
+            if(self.confirm_exit(method_name)):
+                break
+
             params: str = input("Enter the parameters (comma-separated) : ")
+            if(self.confirm_exit(params)):
+                break
+
+            param_types: str = input("Enter the parameter types (comma-separated) : ")
+            if(self.confirm_exit(param_types)):
+                break
 
             rpc_request: RpcRequest = RpcRequest(
                 method=method_name,
-                params=[param.strip() for param in params.split(',')],
-                id=1
+                params=[param.strip() for param in params.split(',')], # コンマ区切りで分割してリストに変換
+                param_types=[ptype.strip() for ptype in param_types.split(',')], # コンマ区切りで分割してリストに変換
+                id=str(uuid.uuid4()) # uuidを使用して一意のIDを生成
             )
 
-            request_data = self.serializer.encode(asdict(rpc_request))
-
             try:
+                rpc_request.casted_params()
+                request_data = self.serializer.encode(asdict(rpc_request))
+
                 self.socket_handler.sendto(request_data, self.server_address)
                 logger.info("The following data was sent to the server: %s", request_data)
-            except Exception as e:
+
+                self.receive_data()
+
+            except RpcTypeCastingError as e:
+                logger.error("Type casting failed: %s", e)
+
+            except RpcError as e:
                 logger.error("Error while sending data: %s", e)
 
     def start_client(self) -> None:
