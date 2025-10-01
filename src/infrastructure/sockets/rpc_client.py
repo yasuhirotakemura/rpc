@@ -24,7 +24,7 @@ class RpcClient:
         """終了確認"""
         if use_input.lower() != "exit":
             return False
-        
+
         return True
 
     def remove_file_if_exists(self) -> None:

@@ -30,5 +30,5 @@ class RpcRequest:
                 raise RpcTypeCastingError(
                     f"Failed to cast param '{p}' to type '{t}'"
                 ) from e
-
+            
         return casted

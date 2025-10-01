@@ -6,7 +6,7 @@ rpc_functions = RpcFunctions()
 
 METHOD_TABLE = {
     "floor": rpc_functions.floor,
-    "nroot": rpc_functions.n_root,
+    "n_root": rpc_functions.n_root,
     "reverse": rpc_functions.reverse,
     "validAnagram": rpc_functions.valid_anagram,
     "sort": rpc_functions.sort,
