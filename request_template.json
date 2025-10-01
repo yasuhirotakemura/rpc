@@ -1,6 +1,12 @@
 {
-   "method": "subtract", 
-   "params": [42, 23], 
-   "param_types": [int, int],
+   "method": "subtract",
+   "params": [
+      42,
+      23
+   ],
+   "param_types": [
+      "int",
+      "int"
+   ],
    "id": 1
 }
