@@ -8,6 +8,7 @@ from src.domain.exceptions.rpc_type_casting_error import RpcTypeCastingError
 from src.domain.interfaces.serializer import Serializer
 from src.domain.entities.rpc_request import RpcRequest
 from src.domain.interfaces.socket_handler import SocketHandler
+from src.application.config import METHOD_TABLE
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -53,6 +54,9 @@ class RpcClient:
             method_name: str = input("Enter the method name : ")
             if(self.confirm_exit(method_name)):
                 break
+            if(method_name not in METHOD_TABLE):
+                logging.error("Method not provided.")
+                continue
 
             params: str = input("Enter the parameters (comma-separated) : ")
             if(self.confirm_exit(params)):
